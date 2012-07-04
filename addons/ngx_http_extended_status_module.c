@@ -261,7 +261,7 @@ put_server_info(ngx_http_request_t  *r)
     u_char  *hostname; 
     size_t  size ;
 
-    size = sizeof(SERVER_INFO) + ngx_cycle->hostname.len + sizeof(NGINX_VERSION) + sizeof("<hr /><br>");
+    size = sizeof(SERVER_INFO) + ngx_cycle->hostname.len + sizeof(NGINX_VERSION); // + sizeof("<hr /><br>");
     b = ngx_create_temp_buf(r->pool, size);
     if (b == NULL) 
         return NULL;
@@ -437,19 +437,23 @@ put_connection_status(ngx_http_request_t *r)
     active = get_int_from_query(r, "active", 6);
     
 
-    sizePerConn = sizeof("<tr><td align=center>%4d-%04d</td>") + 4 + 4;
-    sizePerConn += sizeof("<td align=right> %d </td>") + NGX_INT64_LEN;
-    sizePerConn += sizeof("<td align=center><b>%c</b></td>");
-    sizePerConn += sizeof("<td align=right> %d </td>") + NGX_INT64_LEN;
-    sizePerConn += sizeof("<td> %s </td>") + SCORE__CLIENT_LEN;
-    sizePerConn += sizeof("<td> %s </td>") + SCORE__VHOST_LEN;
-    sizePerConn += sizeof("<td align=right> %.02f </td>") + 5;
-    sizePerConn += sizeof("<td align=right> %d </td>") + NGX_INT64_LEN;
-    sizePerConn += sizeof("<td align=right> %ui </td>") + 3;
-    sizePerConn += sizeof("<td align=right> %d </td>") + NGX_INT64_LEN;
-    sizePerConn += sizeof("<td align=right> %d </td>") + NGX_INT64_LEN;  
-    sizePerConn += sizeof("<td> %s </td></tr>") + SCORE__REQUEST_LEN;
+    sizePerConn = sizeof("{ 'worker': '%4d-%04d', ") + 4 + 4;
+    sizePerConn += sizeof("'acc': '%d', ") + NGX_INT64_LEN;
+    sizePerConn += sizeof("'mode': '%c', ");
+    sizePerConn += sizeof("'bytes': '%d', ") + NGX_INT64_LEN;
+    sizePerConn += sizeof("'client': '%s', ") + SCORE__CLIENT_LEN;
+    sizePerConn += sizeof("'vhost': '%s', ") + SCORE__VHOST_LEN;
+    sizePerConn += sizeof("'gzip-ratio': '%.02f', ") + 5;
+    sizePerConn += sizeof("'ss': '%d', ") + NGX_INT64_LEN;
+    sizePerConn += sizeof("'status': '%ui', ") + 3;
+    sizePerConn += sizeof("'time': '%d', ") + NGX_INT64_LEN;
+    sizePerConn += sizeof("'proxy-time': '%d', ") + NGX_INT64_LEN;      
+    sizePerConn += sizeof("'request': '%s' }") + SCORE__REQUEST_LEN;
     sizePerWorker = sizePerConn * ngx_cycle->connection_n;
+    
+    // account for commas
+    sizePerWorker += sizeof(", ") * (ngx_cycle->connection_n - 1);
+    
        
     /* 7 = sizeof("10r-10r") - 1 */
     b = ngx_create_temp_buf(r->pool, sizeof(CONNECTION_TABLE_HEADER) + 7 + sizePerWorker);  
@@ -465,43 +469,48 @@ put_connection_status(ngx_http_request_t *r)
     b->last = ngx_sprintf(b->last, CONNECTION_TABLE_HEADER, sortingColumns(r));
     for (i = 0; i < ngx_num_workers; i++) {
         for ( j = 0 ; j < ngx_cycle->connection_n ; j++ ) {
-	    k = i * ngx_cycle->connection_n + j ;
-	    cs = (conn_score *) ((char *)conns + sizeof(conn_score) * k);
+	        k = i * ngx_cycle->connection_n + j ;
+	        cs = (conn_score *) ((char *)conns + sizeof(conn_score) * k);
 
-	    if (cs->response_time < response_time || 
+	        if (cs->response_time < response_time || 
                 '\0' ==  cs->client [0] || 
                 '\0' == cs->request [0] || 
                 '\0' == cs->vhost [0])
-	        continue;
-	    if (0 < active && 0 == cs->active)
-	        continue;
+	          continue;
+	        if (0 < active && 0 == cs->active)
+	          continue;
 
-	    b->last = ngx_sprintf(b->last, "<tr><td align=center>%4d-%04d</td>", i, j);
+	        b->last = ngx_sprintf(b->last, "{ 'worker': '%4d-%04d', ", i, j);
 	    
-	    b->last = ngx_sprintf(b->last, "<td align=right> %d </td>", cs->access_count);
-	    b->last = ngx_sprintf(b->last, "<td align=center><b>%c</b></td>", cs->mode);	    
-	    b->last = ngx_sprintf(b->last, "<td align=right> %d </td>", cs->bytes_sent);
+	        b->last = ngx_sprintf(b->last, "'acc': '%d', ", cs->access_count);
+	        b->last = ngx_sprintf(b->last, "'mode': '%c', ", cs->mode);	    
+	        b->last = ngx_sprintf(b->last, "'bytes': '%d', ", cs->bytes_sent);
 	    
-	    b->last = ngx_sprintf(b->last, "<td> %s </td>", cs->client);
-	    b->last = ngx_sprintf(b->last, "<td> %s </td>", cs->vhost);
+	        b->last = ngx_sprintf(b->last, "'client': '%s', ", cs->client);
+	        b->last = ngx_sprintf(b->last, "'vhost': '%s', ", cs->vhost);
 	
-	    if (0 != cs->zin && 0 != cs->zout)
-	        b->last = ngx_sprintf(b->last, "<td align=right> %.02f </td>", get_gzip_ratio(cs->zin, cs->zout));
-	    else
-	        b->last = ngx_sprintf(b->last, "<td align=center> - </td>");
+	        if (0 != cs->zin && 0 != cs->zout)
+	          b->last = ngx_sprintf(b->last, "'gzip-ratio': '%.02f', ", get_gzip_ratio(cs->zin, cs->zout));
+	        else
+	          b->last = ngx_sprintf(b->last, "'gzip-ratio': '-', ");
 
-	    b->last = ngx_sprintf(b->last, "<td align=right> %d </td>", how_long_ago_used(cs->last_used));
-	    b->last = ngx_sprintf(b->last, "<td align=right> %ui </td>", cs->status);
+	        b->last = ngx_sprintf(b->last, "'ss': '%d', ", how_long_ago_used(cs->last_used));
+	        b->last = ngx_sprintf(b->last, "'status': '%ui', ", cs->status);
 
-	    b->last = ngx_sprintf(b->last, "<td align=right> %d </td>", cs->response_time);
+	        b->last = ngx_sprintf(b->last, "'time': '%d', ", cs->response_time);
 
-	    if (0 <= cs->upstream_response_time)
-	        b->last = ngx_sprintf(b->last, "<td align=right> %d </td>", cs->upstream_response_time);	
-	    else
-	        b->last = ngx_sprintf(b->last, "<td align=center><b>-</b></td>");	
+	        if (0 <= cs->upstream_response_time)
+	          b->last = ngx_sprintf(b->last, "'proxy-time': '%d', ", cs->upstream_response_time);	
+	        else
+	          b->last = ngx_sprintf(b->last, "'proxy-time': '-', ");	
 
-	    b->last = ngx_sprintf(b->last, "<td> %s </td></tr>", cs->request);
-	}
+	        b->last = ngx_sprintf(b->last, "'request': '%s' }", cs->request);
+	        
+	        if ((i + 1) < ngx_num_workers) {
+	          b->last = ngx_sprintf(b->last, ", ");	
+	        }
+	        
+	      }
         
         if (i + 1 < ngx_num_workers)
             b = ngx_create_temp_buf(r->pool, sizePerWorker);
@@ -533,7 +542,6 @@ put_footer(ngx_http_request_t *r)
     size_t  size;
 
     size = sizeof(SHORTENED_TABLE);
-    size += sizeof("<hr />");
     size += sizeof(MODE_LIST);
     size += sizeof(HTML_TAIL);
     
@@ -545,7 +553,6 @@ put_footer(ngx_http_request_t *r)
         return NULL;
 
     b->last = ngx_sprintf(b->last, SHORTENED_TABLE);
-    b->last = ngx_sprintf(b->last, "<hr />");
     b->last = ngx_sprintf(b->last, MODE_LIST);
 
     b->last = ngx_sprintf(b->last, HTML_TAIL);
