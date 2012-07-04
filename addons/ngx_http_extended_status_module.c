@@ -603,10 +603,10 @@ ngx_http_status_handler(ngx_http_request_t *r)
     if ( rc != NGX_OK)
         return rc;
 
-    fc = put_header(r);
-    if (fc == NULL)
-        return NGX_HTTP_INTERNAL_SERVER_ERROR;
-    lc = get_lastChain(fc);
+    // fc = put_header(r);
+    // if (fc == NULL)
+    //     return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    // lc = get_lastChain(fc);
 
     mc = put_server_info(r);
     if (mc == NULL)
@@ -632,11 +632,11 @@ ngx_http_status_handler(ngx_http_request_t *r)
     lc->next = mc;
     lc = get_lastChain(mc);
 
-    mc = put_footer(r);
-    if (mc == NULL)
-        return NGX_HTTP_INTERNAL_SERVER_ERROR;
-    lc->next = mc;
-    lc = get_lastChain(mc);
+    // mc = put_footer(r);
+    // if (mc == NULL)
+    //     return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    // lc->next = mc;
+    // lc = get_lastChain(mc);
 
     lc->buf->last_buf = 1;
 
