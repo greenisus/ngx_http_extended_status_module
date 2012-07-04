@@ -298,15 +298,8 @@ put_basic_status(ngx_http_request_t  *r)
     rd = *ngx_stat_reading;
     wr = *ngx_stat_writing;
 
-    // size = sizeof("<b>Active connections: %uA </b>\n<br><br>\n") + NGX_ATOMIC_T_LEN;
-    size = sizeof("'active-connections': '%uA', ") + NGX_ATOMIC_T_LEN;
-    // size += sizeof("<table border=0><tr><th>server accepts</th><th>handled</th><th>requests</th></tr>\n");
-    
-    // size += sizeof("<tr align=right><td> %uA </td><td> %uA </td><td> %uA </td></tr></table><br>\n") + NGX_ATOMIC_T_LEN * 3;
+    size = sizeof("'active-connections': '%uA', ") + NGX_ATOMIC_T_LEN;    
     size += sizeof("'accepts': '%uA', 'handled': '%uA', 'requests': '%uA', ") + NGX_ATOMIC_T_LEN * 3;
-    
-    // size += sizeof("<table border=0><tr><th>Reading:</th><td> %uA </td><th>Writing:</th><td> %uA </td><th>Waiting:</th><td> %uA </td></tr></table>\n") 
-    //     + NGX_ATOMIC_T_LEN * 3;
     size += sizeof("'reading': '%uA', 'writing': '%uA', 'waiting': '%uA', ") 
         + NGX_ATOMIC_T_LEN * 3;
 	
@@ -317,13 +310,8 @@ put_basic_status(ngx_http_request_t  *r)
     if (c == NULL) 
         return NULL;
 
-    // b->last = ngx_sprintf(b->last, "<b>Active connections: %uA </b>\n<br><br>\n", ac);
     b->last = ngx_sprintf(b->last, "'active-connections': '%uA', ", ac);
-    // b->last = ngx_sprintf(b->last, "<table border=0><tr><th>server accepts</th><th>handled</th><th>requests</th></tr>\n");
-    // b->last = ngx_sprintf(b->last, "<tr align=right><td> %uA </td><td> %uA </td><td> %uA </td></tr></table><br>\n", ap, hn, rq);
     b->last = ngx_sprintf(b->last, "'accepts': '%uA', 'handled': '%uA', 'requests': '%uA', ", ap, hn, rq);
-    // b->last = ngx_sprintf(b->last, "<table border=0><tr><th>Reading:</th><td> %uA </td><th>Writing:</th><td> %uA </td><th>Waiting:</th><td> %uA </td></tr></table>\n", 
-    //                       rd, wr, ac - (rd + wr));
     b->last = ngx_sprintf(b->last, "'reading': '%uA', 'writing': '%uA', 'waiting': '%uA', ", 
                           rd, wr, ac - (rd + wr));
     c->buf = b;

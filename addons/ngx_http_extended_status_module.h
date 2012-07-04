@@ -23,23 +23,15 @@
 #define  GZIP_HEADER    "<th class=sortable>Gzip Ratio</th>"
 #define  PROXY_HEADER   "<th class=sortable>Proxy TIME</th>"
 
-#define  SHORTENED_TABLE  "<table>\n"  \
-                     "<tr><th>PID</th><td>OS process ID</td></tr>\n" \
-                     "<tr><th>Acc</th><td>Number of requests serviced with this connection slot</td></tr>\n" \
-                     "<tr><th>M</th><td>Mode of operation</td></tr>\n" \
-                     "<tr><th>CPU</th><td>Accumulated CPU usage in seconds</td></tr>\n" \
-                     "<tr><th>Gzip Ratio</th><td>Ratio of original size to compressed size </td>\n" \
-                     "<tr><th>SS</th><td>Seconds since the request completion</td></tr>\n" \
-                     "<tr><th>Proxy TIME</th><td> Proxy response time in milliseconds. 0 means the value is less than 1 millisecond</td></tr>\n" \
-                     "<tr><th>TIME</th><td>Response time in milliseconds. 0 means the value is less than 1 millisecond</td></tr>\n" \
-                     "</table>\n" 
+#define  SHORTENED_TABLE  "" 
 
-#define  MODE_LIST  "<b>Mode List</b><br><table>" \
-                    "<tr><th>-</th><td>Waiting for request</td></tr>\n" \
-                    "<tr><th>R</th><td>Reading request</td></tr>\n" \
-                    "<tr><th>W</th><td>Sending reply</td></tr>\n" \
-                    "<tr><th>L</th><td>Logging</td></tr>\n" \
-                    "<tr><th>I</th><td>Inactive connection</td></tr>\n"
+#define  MODE_LIST        ""
+// #define  MODE_LIST  "<b>Mode List</b><br><table>" \
+//                     "<tr><th>-</th><td>Waiting for request</td></tr>\n" \
+//                     "<tr><th>R</th><td>Reading request</td></tr>\n" \
+//                     "<tr><th>W</th><td>Sending reply</td></tr>\n" \
+//                     "<tr><th>L</th><td>Logging</td></tr>\n" \
+//                     "<tr><th>I</th><td>Inactive connection</td></tr>\n"
 
 
 #define  MBYTE  1048576.0
