@@ -14,11 +14,13 @@
 
 // #define  CURRENT_TIME          "<script type=text/javascript> var date = new Date() ; document.write( date.toLocaleString() );</script>"
 
-#define  CONNECTION_TABLE_HEADER     "<br><br>\n<table class=sortable-onload-%s cellspacing=1 border=0 cellpadding=1>\n" \
-                               "<thead><tr><th class=sortable>Worker</th><th class=sortable>Acc</th><th class=sortable>M</th>\n" \
-                               "<th class=sortable>Bytes</th><th class=sortable>Client</th><th class=sortable>VHost</th>\n" \
-                               "<th class=sortable>Gzip Ratio</th><th class=sortable>SS</th><th class=sortable>Status</th>\n" \
-                               "<th class=sortable>TIME</th><th class=sortable>Proxy TIME</th><th class=sortable>Request</th></tr></thead><tbody>\n"
+#define  CONNECTION_TABLE_HEADER    "'workers': ["
+
+// #define  CONNECTION_TABLE_HEADER     "<br><br>\n<table class=sortable-onload-%s cellspacing=1 border=0 cellpadding=1>\n" \
+//                                "<thead><tr><th class=sortable>Worker</th><th class=sortable>Acc</th><th class=sortable>M</th>\n" \
+//                                "<th class=sortable>Bytes</th><th class=sortable>Client</th><th class=sortable>VHost</th>\n" \
+//                                "<th class=sortable>Gzip Ratio</th><th class=sortable>SS</th><th class=sortable>Status</th>\n" \
+//                                "<th class=sortable>TIME</th><th class=sortable>Proxy TIME</th><th class=sortable>Request</th></tr></thead><tbody>\n"
 
 #define  GZIP_HEADER    "<th class=sortable>Gzip Ratio</th>"
 #define  PROXY_HEADER   "<th class=sortable>Proxy TIME</th>"

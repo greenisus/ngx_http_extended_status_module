@@ -506,7 +506,7 @@ put_connection_status(ngx_http_request_t *r)
         if (i + 1 < ngx_num_workers)
             b = ngx_create_temp_buf(r->pool, sizePerWorker);
         else
-            b = ngx_create_temp_buf(r->pool, sizeof("</tbody></table><hr /><br>\n"));
+            b = ngx_create_temp_buf(r->pool, sizeof("]"));
         if (b == NULL) 
             return NULL;
         c2 = ngx_pcalloc(r->pool, sizeof(ngx_chain_t));
@@ -519,7 +519,7 @@ put_connection_status(ngx_http_request_t *r)
         c1 = c2;
     }
 
-    b->last = ngx_sprintf(b->last, "</tbody></table><hr /><br>\n");
+    b->last = ngx_sprintf(b->last, "]");
 
     return c;
 }
