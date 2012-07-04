@@ -1,23 +1,12 @@
 
-#define  HTML_HEADER    ""
-// #define  HTML_HEADER    "<html><head><title>Nginx Status</title>\n" \
-//         "<script type=text/javascript src=tablesort.min.js></script>\n" \
-//         "<style type=text/css><!--\n" \
-//         "body{font:bold 15px Georgia, Helvetica, sans-serif;color:#4f6b72;}\n" \
-//         "table{border-top:1px solid #e5eff8;border-right:1px solid #e5eff8;border-collapse:collapse;}\n" \
-//         "th{font:bold 10px \"Century Gothic\", \"Trebuchet MS\", Helvetica, sans-serif;letter-spacing:1px;text-transform:uppercase;background:#f4f9fe;color:#66a3d3;border-bottom:1px solid #e5eff8;border-left:1px solid #e5eff8;padding:8px 5px;}\n" \
-//         "td{border-bottom:1px solid #e5eff8;border-left:1px solid #e5eff8;}\n" \
-//         "tbody td{font:13px Calibri,\"Trebuchet MS\", Helvetica, sans-serif;padding:5px;}\n" \
-//         "tr:hover{background: #d0dafd;color:#000000}\n" \
-//         "--></style>\n" \
-//         "</head>\n<body>\n"
+#define  HTML_HEADER      "{"
 
-// #define  HTML_TAIL        "\n</body></html>"
-#define  HTML_TAIL        ""
+#define  HTML_TAIL        "}"
 
 #define  SAVE_THIS_PAGE   "<input type=button onclick=javascript:saveCurrentState() value=\"Save this page\"><br><br>\n"
 
-#define  SERVER_INFO      "<h1> Nginx Server Status for %s</h1>\n<dl><dt>Server Version: Nginx/%s </dt></dl>\n"
+// #define  SERVER_INFO      "<h1> Nginx Server Status for %s</h1>\n<dl><dt>Server Version: Nginx/%s </dt></dl>\n"
+#define  SERVER_INFO      "'hostname': '%s', 'version': '%s', "
 
 
 #define  WORKER_TABLE_HEADER   "<br><br>\n<table border=0><tr><th>Worker</th><th>PID</th><th>Acc</th><th>Mode</th><th>CPU</th>" \

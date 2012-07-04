@@ -274,7 +274,7 @@ put_server_info(ngx_http_request_t  *r)
         return NULL;
 
     b->last = ngx_sprintf(b->last, SERVER_INFO, hostname, NGINX_VERSION);
-    b->last = ngx_sprintf(b->last, "<hr /><br>"); 
+    // b->last = ngx_sprintf(b->last, "<hr /><br>"); 
 
     c->buf = b;
     c->next = NULL;
@@ -596,8 +596,8 @@ ngx_http_status_handler(ngx_http_request_t *r)
     if (rc != NGX_OK) 
         return rc;
 
-    r->headers_out.content_type.len  = sizeof( "text/html; charset=ISO-8859-1" ) - 1;
-    r->headers_out.content_type.data = (u_char *) "text/html; charset=ISO-8859-1";
+    r->headers_out.content_type.len  = sizeof( "application/json; charset=ISO-8859-1" ) - 1;
+    r->headers_out.content_type.data = (u_char *) "application/json; charset=ISO-8859-1";
 
     rc = set_refresh_header_field(r);
     if ( rc != NGX_OK)
