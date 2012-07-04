@@ -365,9 +365,10 @@ put_worker_status(ngx_http_request_t *r)
 
     size += sizePerWorker * ngx_num_workers;
     size += sizeof("}, ");
-    size += sizeof("<b>Requests/sec: %.02f (last %2d seconds), %.02f (last %2d seconds) &nbsp; &nbsp; at %s</b><br>");
+    
+    // size += sizeof("<b>Requests/sec: %.02f (last %2d seconds), %.02f (last %2d seconds) &nbsp; &nbsp; at %s</b><br>");
+    size += sizeof("'requests-per-second': { 'last-%2d-seconds': '%.02f', 'last-%2d-seconds': '%.02f' }, ");
     size += 7 + 2 + 7 + 2;
-    size += sizeof(CURRENT_TIME);
         
     b = ngx_create_temp_buf(r->pool, size);
     if (b == NULL) 
@@ -403,11 +404,14 @@ put_worker_status(ngx_http_request_t *r)
 	    past -= 1;
 	}
     }
-    b->last = ngx_sprintf(b->last, "}, ");	    
-    b->last = ngx_sprintf(b->last, "<b>Requests/sec: %.02f (last %2d seconds), %.02f (last %2d seconds) &nbsp; &nbsp; at %s</b><br>", 
-                          (float)query_cnt_1 / (float)PERIOD_S, PERIOD_S, 
-                          (float)query_cnt_2 / (float)PERIOD_L, PERIOD_L, 
-                          CURRENT_TIME);
+    b->last = ngx_sprintf(b->last, "}, ");
+    
+    // b->last = ngx_sprintf(b->last, "<b>Requests/sec: %.02f (last %2d seconds), %.02f (last %2d seconds) &nbsp; &nbsp; at %s</b><br>", 
+    //                       (float)query_cnt_1 / (float)PERIOD_S, PERIOD_S, 
+    //                       (float)query_cnt_2 / (float)PERIOD_L, PERIOD_L);
+    b->last = ngx_sprintf(b->last, "'requests-per-second': { 'last-%2d-seconds': '%.02f', 'last-%2d-seconds': '%.02f' }, ", 
+                          PERIOD_S, (float)query_cnt_1 / (float)PERIOD_S, 
+                          PERIOD_L, (float)query_cnt_2 / (float)PERIOD_L);
     c->buf = b;
     c->next = NULL;
 
