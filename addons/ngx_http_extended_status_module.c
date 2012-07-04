@@ -356,15 +356,15 @@ put_worker_status(ngx_http_request_t *r)
 
     size = sizeof(WORKER_TABLE_HEADER);
 
-    sizePerWorker = sizeof("<tr><td align=center>%4d</td>") + 4;
-    sizePerWorker += sizeof("<td> %5d </td>") + 5; /* size of /proc/sys/kernel/pid_max */
-    sizePerWorker += sizeof("<td align=right> %d </td>") + NGX_INT64_LEN;
-    sizePerWorker += sizeof("<td align=center><b> %c </b></td>");
-    sizePerWorker += sizeof("<td> %.2f </td>") + 5; 
-    sizePerWorker += sizeof("<td align=right> %.2f </td></tr>") + NGX_INT64_LEN; 
+    sizePerWorker = sizeof("'worker': '%4d', ") + 4;
+    sizePerWorker += sizeof("'pid': '%5d', ") + 5; /* size of /proc/sys/kernel/pid_max */
+    sizePerWorker += sizeof("'acc': '%d', ") + NGX_INT64_LEN;
+    sizePerWorker += sizeof("'mode': '%c', ");
+    sizePerWorker += sizeof("'cpu': '%.2f', ") + 5; 
+    sizePerWorker += sizeof("'mbytes': '%.2f'") + NGX_INT64_LEN; 
 
     size += sizePerWorker * ngx_num_workers;
-    size += sizeof("</table>\n<br><br>");
+    size += sizeof("}, ");
     size += sizeof("<b>Requests/sec: %.02f (last %2d seconds), %.02f (last %2d seconds) &nbsp; &nbsp; at %s</b><br>");
     size += 7 + 2 + 7 + 2;
     size += sizeof(CURRENT_TIME);
@@ -381,14 +381,14 @@ put_worker_status(ngx_http_request_t *r)
     for (i = 0; i < ngx_num_workers; i++) {
 	ws = (worker_score *) ((char *)workers + WORKER_SCORE_LEN * i);
 
-	b->last = ngx_sprintf(b->last, "<tr><td align=center>%4d</td>", i);	
-	b->last = ngx_sprintf(b->last, "<td> %5d </td>", ws->pid);    
-	b->last = ngx_sprintf(b->last, "<td align=right> %d </td>", ws->access_count);
-	b->last = ngx_sprintf(b->last, "<td align=center><b> %c </b></td>", ws->mode);    
-	b->last = ngx_sprintf(b->last, "<td> %.2f </td>",   
+	b->last = ngx_sprintf(b->last, "'worker': '%4d', ", i);	
+	b->last = ngx_sprintf(b->last, "'pid': '%5d', ", ws->pid);    
+	b->last = ngx_sprintf(b->last, "'acc': '%d', ", ws->access_count);
+	b->last = ngx_sprintf(b->last, "'mode': '%c', ", ws->mode);    
+	b->last = ngx_sprintf(b->last, "'cpu': '%.2f', ",   
                               (ws->times.tms_utime + ws->times.tms_stime + 
                                ws->times.tms_cutime + ws->times.tms_cstime) / (float) hz);
-	b->last = ngx_sprintf(b->last, "<td align=right> %.2f </td></tr>", (float) ws->bytes_sent / MBYTE);
+	b->last = ngx_sprintf(b->last, "'mbytes': '%.2f'", (float) ws->bytes_sent / MBYTE);
 
 	tmp_idx = index;
 	past = current;
@@ -403,7 +403,7 @@ put_worker_status(ngx_http_request_t *r)
 	    past -= 1;
 	}
     }
-    b->last = ngx_sprintf(b->last, "</table>\n<br><br>");	    
+    b->last = ngx_sprintf(b->last, "}, ");	    
     b->last = ngx_sprintf(b->last, "<b>Requests/sec: %.02f (last %2d seconds), %.02f (last %2d seconds) &nbsp; &nbsp; at %s</b><br>", 
                           (float)query_cnt_1 / (float)PERIOD_S, PERIOD_S, 
                           (float)query_cnt_2 / (float)PERIOD_L, PERIOD_L, 
