@@ -298,9 +298,9 @@ put_basic_status(ngx_http_request_t  *r)
     rd = *ngx_stat_reading;
     wr = *ngx_stat_writing;
 
-    size = sizeof("'active-connections': '%uA', ") + NGX_ATOMIC_T_LEN;    
-    size += sizeof("'accepts': '%uA', 'handled': '%uA', 'requests': '%uA', ") + NGX_ATOMIC_T_LEN * 3;
-    size += sizeof("'reading': '%uA', 'writing': '%uA', 'waiting': '%uA', ") 
+    size = sizeof("\"active-connections\": \"%uA\", ") + NGX_ATOMIC_T_LEN;    
+    size += sizeof("\"accepts\": \"%uA\", \"handled\": \"%uA\", \"requests\": \"%uA\", ") + NGX_ATOMIC_T_LEN * 3;
+    size += sizeof("\"reading\": \"%uA\", \"writing\": \"%uA\", \"waiting\": \"%uA\", ") 
         + NGX_ATOMIC_T_LEN * 3;
 	
     b = ngx_create_temp_buf(r->pool, size);
@@ -310,9 +310,9 @@ put_basic_status(ngx_http_request_t  *r)
     if (c == NULL) 
         return NULL;
 
-    b->last = ngx_sprintf(b->last, "'active-connections': '%uA', ", ac);
-    b->last = ngx_sprintf(b->last, "'accepts': '%uA', 'handled': '%uA', 'requests': '%uA', ", ap, hn, rq);
-    b->last = ngx_sprintf(b->last, "'reading': '%uA', 'writing': '%uA', 'waiting': '%uA', ", 
+    b->last = ngx_sprintf(b->last, "\"active-connections\": \"%uA\", ", ac);
+    b->last = ngx_sprintf(b->last, "\"accepts\": \"%uA\", \"handled\": \"%uA\", \"requests\": \"%uA\", ", ap, hn, rq);
+    b->last = ngx_sprintf(b->last, "\"reading\": \"%uA\", \"writing\": \"%uA\", \"waiting\": \"%uA\", ", 
                           rd, wr, ac - (rd + wr));
     c->buf = b;
     c->next = NULL;
@@ -356,18 +356,18 @@ put_worker_status(ngx_http_request_t *r)
 
     size = sizeof(WORKER_TABLE_HEADER);
 
-    sizePerWorker = sizeof("'worker': '%4d', ") + 4;
-    sizePerWorker += sizeof("'pid': '%5d', ") + 5; /* size of /proc/sys/kernel/pid_max */
-    sizePerWorker += sizeof("'acc': '%d', ") + NGX_INT64_LEN;
-    sizePerWorker += sizeof("'mode': '%c', ");
-    sizePerWorker += sizeof("'cpu': '%.2f', ") + 5; 
-    sizePerWorker += sizeof("'mbytes': '%.2f'") + NGX_INT64_LEN; 
+    sizePerWorker = sizeof("\"worker\": \"%4d\", ") + 4;
+    sizePerWorker += sizeof("\"pid\": \"%5d\", ") + 5; /* size of /proc/sys/kernel/pid_max */
+    sizePerWorker += sizeof("\"acc\": \"%d\", ") + NGX_INT64_LEN;
+    sizePerWorker += sizeof("\"mode\": \"%c\", ");
+    sizePerWorker += sizeof("\"cpu\": \"%.2f\", ") + 5; 
+    sizePerWorker += sizeof("\"mbytes\": \"%.2f\"") + NGX_INT64_LEN; 
 
     size += sizePerWorker * ngx_num_workers;
     size += sizeof("}, ");
     
     // size += sizeof("<b>Requests/sec: %.02f (last %2d seconds), %.02f (last %2d seconds) &nbsp; &nbsp; at %s</b><br>");
-    size += sizeof("'requests-per-second': { 'last-%2d-seconds': '%.02f', 'last-%2d-seconds': '%.02f' }, ");
+    size += sizeof("\"requests-per-second\": { \"last-%2d-seconds\": \"%.02f\", \"last-%2d-seconds\": \"%.02f\" }, ");
     size += 7 + 2 + 7 + 2;
         
     b = ngx_create_temp_buf(r->pool, size);
@@ -382,14 +382,14 @@ put_worker_status(ngx_http_request_t *r)
     for (i = 0; i < ngx_num_workers; i++) {
 	ws = (worker_score *) ((char *)workers + WORKER_SCORE_LEN * i);
 
-	b->last = ngx_sprintf(b->last, "'worker': '%4d', ", i);	
-	b->last = ngx_sprintf(b->last, "'pid': '%5d', ", ws->pid);    
-	b->last = ngx_sprintf(b->last, "'acc': '%d', ", ws->access_count);
-	b->last = ngx_sprintf(b->last, "'mode': '%c', ", ws->mode);    
-	b->last = ngx_sprintf(b->last, "'cpu': '%.2f', ",   
+	b->last = ngx_sprintf(b->last, "\"worker\": \"%4d\", ", i);	
+	b->last = ngx_sprintf(b->last, "\"pid\": \"%5d\", ", ws->pid);    
+	b->last = ngx_sprintf(b->last, "\"acc\": \"%d\", ", ws->access_count);
+	b->last = ngx_sprintf(b->last, "\"mode\": \"%c\", ", ws->mode);    
+	b->last = ngx_sprintf(b->last, "\"cpu\": \"%.2f\", ",   
                               (ws->times.tms_utime + ws->times.tms_stime + 
                                ws->times.tms_cutime + ws->times.tms_cstime) / (float) hz);
-	b->last = ngx_sprintf(b->last, "'mbytes': '%.2f'", (float) ws->bytes_sent / MBYTE);
+	b->last = ngx_sprintf(b->last, "\"mbytes\": \"%.2f\"", (float) ws->bytes_sent / MBYTE);
 
 	tmp_idx = index;
 	past = current;
@@ -409,7 +409,7 @@ put_worker_status(ngx_http_request_t *r)
     // b->last = ngx_sprintf(b->last, "<b>Requests/sec: %.02f (last %2d seconds), %.02f (last %2d seconds) &nbsp; &nbsp; at %s</b><br>", 
     //                       (float)query_cnt_1 / (float)PERIOD_S, PERIOD_S, 
     //                       (float)query_cnt_2 / (float)PERIOD_L, PERIOD_L);
-    b->last = ngx_sprintf(b->last, "'requests-per-second': { 'last-%2d-seconds': '%.02f', 'last-%2d-seconds': '%.02f' }, ", 
+    b->last = ngx_sprintf(b->last, "\"requests-per-second\": { \"last-%2d-seconds\": \"%.02f\", \"last-%2d-seconds\": \"%.02f\" }, ", 
                           PERIOD_S, (float)query_cnt_1 / (float)PERIOD_S, 
                           PERIOD_L, (float)query_cnt_2 / (float)PERIOD_L);
     c->buf = b;
@@ -437,18 +437,18 @@ put_connection_status(ngx_http_request_t *r)
     active = get_int_from_query(r, "active", 6);
     
 
-    sizePerConn = sizeof("{ 'worker': '%4d-%04d', ") + 4 + 4;
-    sizePerConn += sizeof("'acc': '%d', ") + NGX_INT64_LEN;
-    sizePerConn += sizeof("'mode': '%c', ");
-    sizePerConn += sizeof("'bytes': '%d', ") + NGX_INT64_LEN;
-    sizePerConn += sizeof("'client': '%s', ") + SCORE__CLIENT_LEN;
-    sizePerConn += sizeof("'vhost': '%s', ") + SCORE__VHOST_LEN;
-    sizePerConn += sizeof("'gzip-ratio': '%.02f', ") + 5;
-    sizePerConn += sizeof("'ss': '%d', ") + NGX_INT64_LEN;
-    sizePerConn += sizeof("'status': '%ui', ") + 3;
-    sizePerConn += sizeof("'time': '%d', ") + NGX_INT64_LEN;
-    sizePerConn += sizeof("'proxy-time': '%d', ") + NGX_INT64_LEN;      
-    sizePerConn += sizeof("'request': '%s' }") + SCORE__REQUEST_LEN;
+    sizePerConn = sizeof("{ \"worker\": \"%4d-%04d\", ") + 4 + 4;
+    sizePerConn += sizeof("\"acc\": \"%d\", ") + NGX_INT64_LEN;
+    sizePerConn += sizeof("\"mode\": \"%c\", ");
+    sizePerConn += sizeof("\"bytes\": \"%d\", ") + NGX_INT64_LEN;
+    sizePerConn += sizeof("\"client\": \"%s\", ") + SCORE__CLIENT_LEN;
+    sizePerConn += sizeof("\"vhost\": \"%s\", ") + SCORE__VHOST_LEN;
+    sizePerConn += sizeof("\"gzip-ratio\": \"%.02f\", ") + 5;
+    sizePerConn += sizeof("\"ss\": \"%d\", ") + NGX_INT64_LEN;
+    sizePerConn += sizeof("\"status\": \"%ui\", ") + 3;
+    sizePerConn += sizeof("\"time\": \"%d\", ") + NGX_INT64_LEN;
+    sizePerConn += sizeof("\"proxy-time\": \"%d\", ") + NGX_INT64_LEN;      
+    sizePerConn += sizeof("\"request\": \"%s\" }") + SCORE__REQUEST_LEN;
     sizePerWorker = sizePerConn * ngx_cycle->connection_n;
     
     // account for commas
@@ -480,31 +480,31 @@ put_connection_status(ngx_http_request_t *r)
 	        if (0 < active && 0 == cs->active)
 	          continue;
 
-	        b->last = ngx_sprintf(b->last, "{ 'worker': '%4d-%04d', ", i, j);
+	        b->last = ngx_sprintf(b->last, "{ \"worker\": \"%4d-%04d\", ", i, j);
 	    
-	        b->last = ngx_sprintf(b->last, "'acc': '%d', ", cs->access_count);
-	        b->last = ngx_sprintf(b->last, "'mode': '%c', ", cs->mode);	    
-	        b->last = ngx_sprintf(b->last, "'bytes': '%d', ", cs->bytes_sent);
+	        b->last = ngx_sprintf(b->last, "\"acc\": \"%d\", ", cs->access_count);
+	        b->last = ngx_sprintf(b->last, "\"mode\": \"%c\", ", cs->mode);	    
+	        b->last = ngx_sprintf(b->last, "\"bytes\": \"%d\", ", cs->bytes_sent);
 	    
-	        b->last = ngx_sprintf(b->last, "'client': '%s', ", cs->client);
-	        b->last = ngx_sprintf(b->last, "'vhost': '%s', ", cs->vhost);
+	        b->last = ngx_sprintf(b->last, "\"client\": \"%s\", ", cs->client);
+	        b->last = ngx_sprintf(b->last, "\"vhost\": \"%s\", ", cs->vhost);
 	
 	        if (0 != cs->zin && 0 != cs->zout)
-	          b->last = ngx_sprintf(b->last, "'gzip-ratio': '%.02f', ", get_gzip_ratio(cs->zin, cs->zout));
+	          b->last = ngx_sprintf(b->last, "\"gzip-ratio\": \"%.02f\", ", get_gzip_ratio(cs->zin, cs->zout));
 	        else
-	          b->last = ngx_sprintf(b->last, "'gzip-ratio': '-', ");
+	          b->last = ngx_sprintf(b->last, "\"gzip-ratio\": \"-\", ");
 
-	        b->last = ngx_sprintf(b->last, "'ss': '%d', ", how_long_ago_used(cs->last_used));
-	        b->last = ngx_sprintf(b->last, "'status': '%ui', ", cs->status);
+	        b->last = ngx_sprintf(b->last, "\"ss\": \"%d\", ", how_long_ago_used(cs->last_used));
+	        b->last = ngx_sprintf(b->last, "\"status\": \"%ui\", ", cs->status);
 
-	        b->last = ngx_sprintf(b->last, "'time': '%d', ", cs->response_time);
+	        b->last = ngx_sprintf(b->last, "\"time\": \"%d\", ", cs->response_time);
 
 	        if (0 <= cs->upstream_response_time)
-	          b->last = ngx_sprintf(b->last, "'proxy-time': '%d', ", cs->upstream_response_time);	
+	          b->last = ngx_sprintf(b->last, "\"proxy-time\": \"%d\", ", cs->upstream_response_time);	
 	        else
-	          b->last = ngx_sprintf(b->last, "'proxy-time': '-', ");	
+	          b->last = ngx_sprintf(b->last, "\"proxy-time\": \"-\", ");	
 
-	        b->last = ngx_sprintf(b->last, "'request': '%s' }", cs->request);
+	        b->last = ngx_sprintf(b->last, "\"request\": \"%s\" }", cs->request);
 	        
 	        if ((i + 1) < ngx_num_workers) {
 	          b->last = ngx_sprintf(b->last, ", ");	

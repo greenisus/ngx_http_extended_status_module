@@ -6,15 +6,15 @@
 #define  SAVE_THIS_PAGE   "<input type=button onclick=javascript:saveCurrentState() value=\"Save this page\"><br><br>\n"
 
 // #define  SERVER_INFO      "<h1> Nginx Server Status for %s</h1>\n<dl><dt>Server Version: Nginx/%s </dt></dl>\n"
-#define  SERVER_INFO      "'hostname': '%s', 'version': '%s', "
+#define  SERVER_INFO      "\"hostname\": \"%s\", \"version\": \"%s\", "
 
-#define  WORKER_TABLE_HEADER   "'worker': {"
+#define  WORKER_TABLE_HEADER   "\"worker\": {"
 // #define  WORKER_TABLE_HEADER   "<br><br>\n<table border=0><tr><th>Worker</th><th>PID</th><th>Acc</th><th>Mode</th><th>CPU</th>" \
 //                                "<th>Mbytes</th></tr>\n" 
 
 // #define  CURRENT_TIME          "<script type=text/javascript> var date = new Date() ; document.write( date.toLocaleString() );</script>"
 
-#define  CONNECTION_TABLE_HEADER    "'workers': ["
+#define  CONNECTION_TABLE_HEADER    "\"workers\": ["
 
 // #define  CONNECTION_TABLE_HEADER     "<br><br>\n<table class=sortable-onload-%s cellspacing=1 border=0 cellpadding=1>\n" \
 //                                "<thead><tr><th class=sortable>Worker</th><th class=sortable>Acc</th><th class=sortable>M</th>\n" \
